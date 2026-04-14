@@ -1,0 +1,12 @@
+SELECT * FROM customer;
+
+SELECT first_name, last_name FROM customer;
+
+SELECT * FROM film
+WHERE length > 120;
+
+SELECT * FROM film
+WHERE release_year = 2006;
+
+SELECT * FROM customer
+WHERE active = 1;
