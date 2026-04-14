@@ -1,0 +1,50 @@
+SELECT c.first_name, c.last_name
+FROM customer c
+LEFT JOIN rental r ON c.customer_id = r.customer_id
+WHERE r.rental_id IS NULL;
+
+SELECT f.title
+FROM film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_id IS NULL;
+
+SELECT 
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) AS total_alugueis,
+    SUM(p.amount) AS total_gasto,
+    AVG(p.amount) AS ticket_medio
+FROM customer c
+LEFT JOIN rental r ON c.customer_id = r.customer_id
+LEFT JOIN payment p ON c.customer_id = p.customer_id
+GROUP BY c.customer_id;
+
+SELECT DATE(rental_date) AS dia, COUNT(*) AS total_alugueis
+FROM rental
+GROUP BY dia
+ORDER BY total_alugueis DESC
+LIMIT 1;
+
+SELECT 
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) AS total_filmes,
+    cat.name AS categoria_favorita
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film_category fc ON i.film_id = fc.film_id
+JOIN category cat ON fc.category_id = cat.category_id
+GROUP BY c.customer_id, cat.name
+HAVING COUNT(r.rental_id) = (
+    SELECT MAX(qtd)
+    FROM (
+        SELECT COUNT(*) AS qtd
+        FROM rental r2
+        JOIN inventory i2 ON r2.inventory_id = i2.inventory_id
+        JOIN film_category fc2 ON i2.film_id = fc2.film_id
+        WHERE r2.customer_id = c.customer_id
+        GROUP BY fc2.category_id
+    ) AS sub
+);
